@@ -1,0 +1,28 @@
+modLoader = "javafml"
+loaderVersion = "[47,)"
+#issueTrackerURL = ""
+license = "Insert License Here"
+
+[[mods]]
+modId = "elytradurabilityindicator"
+version = "0.1"
+displayName = "Elytra Durability Indicator"
+authors = "HoshinOFW"
+description = '''
+Displays your elytra's durability under your crosshair!
+'''
+#logoFile = ""
+
+[[dependencies.elytradurabilityindicator]]
+modId = "forge"
+mandatory = true
+versionRange = "[47,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.elytradurabilityindicator]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.20.1,)"
+ordering = "NONE"
+side = "BOTH"
