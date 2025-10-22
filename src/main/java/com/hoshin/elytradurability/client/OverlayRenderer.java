@@ -4,7 +4,6 @@ package com.hoshin.elytradurability.client;
 import com.hoshin.elytradurability.core.EDIConfig;
 import com.hoshin.elytradurability.core.ElytraDurabilityIndicator;
 import com.mojang.blaze3d.platform.Window;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
@@ -59,14 +58,14 @@ public class OverlayRenderer {
         if (player == null) return;
 
         ItemStack chestItem = player.getItemBySlot(EquipmentSlot.CHEST);
-        if (chestItem.getItem() != Items.ELYTRA) return;
+        if (!((chestItem.getItem() == Items.ELYTRA) && chestItem.isDamaged()) || (player.isSpectator())) return;
 
         int barW1 = bar_width();
         int barW2 = computeRenderedBarWidth(chestItem);
         int barH = bar_height();
         int iconSize = 16;
 
-        //Don't ask why there are is +1 then -1... It only works like this I promise
+        //Don't ask why there are is +1 then -1... The minecraft crosshair is uncentered
         int centerX = (window.getGuiScaledWidth() / 2) - 1;
         int centerY = (window.getGuiScaledHeight() / 2);
 
@@ -93,13 +92,14 @@ public class OverlayRenderer {
     }
 
     public static int computeRenderedBarWidth(ItemStack itemStack) {
-        return Math.round(bar_width() * computeBarPercentage(itemStack));
+        return Math.round(bar_width() * computeBarMultiplier(itemStack));
     }
 
-    public static float computeBarPercentage(ItemStack itemStack) {
+    public static float computeBarMultiplier(ItemStack itemStack) {
         int damage = itemStack.getDamageValue();
         int max = itemStack.getMaxDamage();
         float remaining = max - damage; // durability left
+        if (remaining == 1) {return 0;}
         return clamp(remaining / (float) max, 0.0F, 1.0F);
     }
 
