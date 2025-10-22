@@ -23,6 +23,9 @@ public class EDIConfig {
         public final ForgeConfigSpec.IntValue ICON_OFFSET;
         public final ForgeConfigSpec.IntValue DAMAGED_BAR_COLOR;
         public final ForgeConfigSpec.IntValue FULL_BAR_COLOR;
+        public final ForgeConfigSpec.BooleanValue DISAPPEARS_WHILE_FULL;
+        public final ForgeConfigSpec.BooleanValue ONLY_WHILE_FLYING;
+        public final ForgeConfigSpec.BooleanValue ALWAYS_RENDER_WHEN_BROKEN;
 
 
         public Client(ForgeConfigSpec.Builder builder) {
@@ -36,14 +39,23 @@ public class EDIConfig {
             BAR_WIDTH = builder.comment("Pixel width of the durability progress bar")
                     .defineInRange("barWidth", 25, 1, 500);
 
-            ICON_OFFSET = builder.comment("Distance between the center of the screen and the top of the icon")
-                    .defineInRange("iconOffset", 7, 1, 100);
-
             FULL_BAR_COLOR = builder.comment("ARGB integer determining the color and opacity of the bar rendered behind the durability bar.")
-                    .defineInRange("fullBarColor", 58753152, Integer.MIN_VALUE, Integer.MAX_VALUE);
+                    .defineInRange("fullBarColor", 0x3808080, Integer.MIN_VALUE, Integer.MAX_VALUE);
 
             DAMAGED_BAR_COLOR = builder.comment("ARGB integer determining the color and opacity of the durability bar")
                     .defineInRange("damagedBarColor", 0xFFFFFFFF, Integer.MIN_VALUE, Integer.MAX_VALUE);
+
+            ICON_OFFSET = builder.comment("Distance between the center of the screen and the top of the icon")
+                    .defineInRange("iconOffset", 7, 1, 100);
+
+            DISAPPEARS_WHILE_FULL = builder.comment("Does the GUI element disappear when your elytra is fully repaired?")
+                    .define("disappearWhileFull", true);
+
+            ONLY_WHILE_FLYING = builder.comment("Does the GUI element only appear while flying with your elytra?")
+                    .define("onlyWhileFlying", true);
+
+            ALWAYS_RENDER_WHEN_BROKEN = builder.comment("Does the GUI element always render when your elytra is broken?")
+                    .define("alwaysRenderWhenBroken", true);
 
             builder.pop();
         }

@@ -50,6 +50,18 @@ public class OverlayRenderer {
         return EDIConfig.CLIENT.DAMAGED_BAR_COLOR.get();
     }
 
+    public static boolean disappears_while_full() {
+        return EDIConfig.CLIENT.DISAPPEARS_WHILE_FULL.get();
+    }
+
+    public static boolean only_while_flying() {
+        return EDIConfig.CLIENT.ONLY_WHILE_FLYING.get();
+    }
+
+    public static boolean always_render_when_broken() {
+        return EDIConfig.CLIENT.ALWAYS_RENDER_WHEN_BROKEN.get();
+    }
+
     @SubscribeEvent
     public static void onRenderGui(RenderGuiOverlayEvent event) {
 
@@ -58,10 +70,16 @@ public class OverlayRenderer {
         if (player == null) return;
 
         ItemStack chestItem = player.getItemBySlot(EquipmentSlot.CHEST);
-        if (!((chestItem.getItem() == Items.ELYTRA) && chestItem.isDamaged()) || (player.isSpectator())) return;
+
+        if (player.isSpectator()) return;
+        if (chestItem.getItem() != Items.ELYTRA) return;
+        if (disappears_while_full() && !chestItem.isDamaged()) return;
 
         int barW1 = bar_width();
         int barW2 = computeRenderedBarWidth(chestItem);
+
+        if ((only_while_flying() && !player.isFallFlying()) && !(always_render_when_broken() && barW2 == 0)) return;
+
         int barH = bar_height();
         int iconSize = 16;
 
