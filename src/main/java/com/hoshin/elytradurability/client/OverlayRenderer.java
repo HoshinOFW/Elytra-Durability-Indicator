@@ -73,12 +73,11 @@ public class OverlayRenderer {
 
         if (player.isSpectator()) return;
         if (chestItem.getItem() != Items.ELYTRA) return;
-        if (disappears_while_full() && !chestItem.isDamaged()) return;
+        if ((disappears_while_full() && !chestItem.isDamaged()) && !player.isFallFlying()) return;
+        if ((only_while_flying() && !player.isFallFlying()) && !(always_render_when_broken() && computeBarMultiplier(chestItem) == 0)) return;
 
         int barW1 = bar_width();
         int barW2 = computeRenderedBarWidth(chestItem);
-
-        if ((only_while_flying() && !player.isFallFlying()) && !(always_render_when_broken() && barW2 == 0)) return;
 
         int barH = bar_height();
         int iconSize = 16;
