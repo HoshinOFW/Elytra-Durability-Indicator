@@ -4,6 +4,7 @@ package com.hoshin.elytradurability.client;
 import com.hoshin.elytradurability.core.EDIConfig;
 import com.hoshin.elytradurability.core.ElytraDurabilityIndicator;
 import com.mojang.blaze3d.platform.Window;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
@@ -12,11 +13,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.RenderGuiEvent;
 import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = ElytraDurabilityIndicator.MOD_ID, value = Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = ElytraDurabilityIndicator.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class OverlayRenderer {
     private static final ResourceLocation ELYTRA_ICON = new ResourceLocation(ElytraDurabilityIndicator.MOD_ID, "textures/gui/elytra_icon.png");
 
@@ -63,49 +65,57 @@ public class OverlayRenderer {
     }
 
     @SubscribeEvent
-    public static void onRenderGui(RenderGuiOverlayEvent event) {
-
+    public static void onRenderCrosshair(RenderGuiEvent event) {
         GuiGraphics guiGraphics = event.getGuiGraphics();
-        Player player = Minecraft.getInstance().player;
-        if (player == null) return;
+        PoseStack matrix = guiGraphics.pose();
+        matrix.pushPose();
+        try {
+            Player player = Minecraft.getInstance().player;
+            if (player == null) return;
 
-        ItemStack chestItem = player.getItemBySlot(EquipmentSlot.CHEST);
+            ItemStack chestItem = player.getItemBySlot(EquipmentSlot.CHEST);
 
-        if (player.isSpectator()) return;
-        if (chestItem.getItem() != Items.ELYTRA) return;
-        if ((disappears_while_full() && !chestItem.isDamaged()) && !player.isFallFlying()) return;
-        if ((only_while_flying() && !player.isFallFlying()) && !(always_render_when_broken() && computeBarMultiplier(chestItem) == 0)) return;
+            if (player.isSpectator()) return;
+            if (chestItem.getItem() != Items.ELYTRA) return;
+            if ((disappears_while_full() && !chestItem.isDamaged()) && !player.isFallFlying()) return;
+            if ((only_while_flying() && !player.isFallFlying()) && !(always_render_when_broken() && computeBarMultiplier(chestItem) == 0)) return;
 
-        int barW1 = bar_width();
-        int barW2 = computeRenderedBarWidth(chestItem);
+            int barW1 = bar_width();
+            int barW2 = computeRenderedBarWidth(chestItem);
+            int barWHalf = (barW2 / 2);
 
-        int barH = bar_height();
-        int iconSize = 16;
+            int barH = bar_height();
+            int iconSize = 16;
 
-        //Don't ask why there are is +1 then -1... The minecraft crosshair is uncentered
-        int centerX = (window.getGuiScaledWidth() / 2) - 1;
-        int centerY = (window.getGuiScaledHeight() / 2);
+            //Don't ask why there are is +1 then -1... The minecraft crosshair is uncentered
+            int centerX = (window.getGuiScaledWidth() / 2) - 1;
+            int centerY = (window.getGuiScaledHeight() / 2);
 
-        int iconX = (centerX - (iconSize / 2)) + 1;
-        int iconY = centerY + icon_offset();
+            int barXFull = (centerX - (barW1 / 2));
+            int barXDamagedLeft = (centerX - barWHalf);
+            int barXDamagedRight = barWHalf != 0 ? (centerX + barWHalf + 1) : centerX;
+            int barY1 = (centerY + bar_vertical_offset());
+            int barY2 = barY1 + barH;
 
-        int barXFull = centerX - (barW1 / 2);
-        int barXDamaged = centerX - (barW2 / 2);
-        int barY1 = centerY + bar_vertical_offset();
-        int barY2 = barY1 + barH;
+            //Semi transparent gray background
+            guiGraphics.fill(barXFull, barY1, barXFull + barW1, barY2, full_bar_color());
+            // White overlay
+            guiGraphics.fill(barXDamagedLeft, barY1, barXDamagedRight, barY2, damaged_bar_color());
 
-        //Semi transparent gray background
-        guiGraphics.fill(barXFull, barY1, barXFull + barW1, barY2, full_bar_color());
-        // White overlay
-        guiGraphics.fill(barXDamaged, barY1, barXDamaged + barW2, barY2, damaged_bar_color());
+            int iconX = (centerX - (iconSize / 2) + 1);
+            int iconY = centerY + icon_offset();
 
-        guiGraphics.blit(
-                ELYTRA_ICON,
-                iconX, iconY,     // x, y
-                0, 0,       // u, v (start of texture)
-                16, 16,     // width, height to draw
-                16, 16      // texture sheet size
-        );
+            guiGraphics.blit(
+                    ELYTRA_ICON,
+                    iconX, iconY,
+                    0, 0,
+                    16, 16,
+                    16, 16
+            );
+
+        } finally {
+            matrix.popPose();
+        }
     }
 
     public static int computeRenderedBarWidth(ItemStack itemStack) {

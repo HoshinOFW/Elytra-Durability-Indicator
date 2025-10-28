@@ -40,7 +40,7 @@ public class EDIConfig {
                     .defineInRange("barWidth", 25, 1, 500);
 
             FULL_BAR_COLOR = builder.comment("ARGB integer determining the color and opacity of the bar rendered behind the durability bar.")
-                    .defineInRange("fullBarColor", 0x3808080, Integer.MIN_VALUE, Integer.MAX_VALUE);
+                    .defineInRange("fullBarColor", 0x40808080, Integer.MIN_VALUE, Integer.MAX_VALUE);
 
             DAMAGED_BAR_COLOR = builder.comment("ARGB integer determining the color and opacity of the durability bar")
                     .defineInRange("damagedBarColor", 0xFFFFFFFF, Integer.MIN_VALUE, Integer.MAX_VALUE);

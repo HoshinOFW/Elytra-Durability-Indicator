@@ -1,11 +1,11 @@
 modLoader = "javafml"
 loaderVersion = "[47,)"
 #issueTrackerURL = ""
-license = "Insert License Here"
+license = "Apache License 2.0"
 
 [[mods]]
 modId = "elytradurabilityindicator"
-version = "0.1"
+version = "1.4"
 displayName = "Elytra Durability Indicator"
 authors = "HoshinOFW"
 description = '''
